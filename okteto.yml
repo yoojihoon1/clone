@@ -25,15 +25,16 @@ deploy:
   - helm upgrade --install result result/chart --set image=${OKTETO_BUILD_RESULT_IMAGE}
   - helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
 
+forward:
+  - 9092:kafka:9092
+
 dev:
   vote:
-    command: mvn spring-boot:run
-    sync:
-      - ./vote:/app
-    forward:
-    - 5005:5005
-    persistentVolume:
-      enabled: false
+    mode: hybrid
+    command: bash # mvn spring-boot:run
+    workdir: vote
+    reverse:
+    - 8080:8080
 
   result:
     command: nodemon server.js
